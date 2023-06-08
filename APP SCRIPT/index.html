@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <div class="message"></div>
+    <form>
+      <input type="file" name="file" />
+      <input type="submit" name="add File" />
+    </form>
+  </body>
+  <script>
+    const myForm = document.querySelector('form');
+    const myUpload = document.querySelector('input[name="file"]');
+    const message = document.querySelector('.message');
+    myForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      message.textContent = "Form Submitted";
+      const file = myUpload.files[0];
+      const fileR = new FileReader();
+      fileR.onload = function(e) {
+        const vals = fileR.result.split(','); 
+        const obj = {
+          fileName: file.name,
+          mimeType: file.type,
+          data: vals[1]
+        };
+        console.log(obj);
+
+        google.script.run.withSuccessHandler(myResult).adderFile(obj);
+      };
+      fileR.readAsDataURL(file);
+    });
+
+    function myResult(val) {
+      message.innerHTML = `<a href="${val.url}" target="_blank">${val.name}</a>`;
+    }
+  </script>
+</html>
